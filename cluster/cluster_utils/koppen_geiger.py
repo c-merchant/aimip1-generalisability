@@ -10,20 +10,95 @@ Change log:
 - 10-02-26: Initial implementation by [BSC] 
     - Updated description to include arguments and return descriptions.
     - Changed np.NaN to np.nan to work with numpy > 2.0
-    Commit: (efced563f499f9d611376c6600cc420928a562c1)
+    Commit: efced563f499f9d611376c6600cc420928a562c1
 
     - Corrected description regarding ordering of dimensions
+    Commit: 20a985a6a833a0f1ccc321d9046598eace5fd47b
 """
 
 import numpy as np
 import cluster
 import pandas as pd
+import logging
+from scipy import stats
 
 class KoppenGeiger():
     def __init__(self, koppen_table_path: str=cluster.__path__[0] + '/cluster_assets/koppen_table.csv'):
         self.koppen_table = pd.read_csv(koppen_table_path)
 
+
     def classify(self, T, P):
+        """
+        Classifies the provided temperature and precipitation data using the Köppen-Geiger classification. 
+        This implementation is designed to work with a single year of climatology, i.e. T and P should have 
+        shape (12, spatial_dim_1, spatial_dim_2). The function checks that the input data has the correct 
+        shape and then applies the classification using the single_year_classification method. 
+
+        Based on [1] and [2] if there is climatology for more than one year, this can be used to gain confidence estimates, and is implemented below.
+
+        Args:
+            T (numpy.ndarray): 3D array of monthly temperature climatology (degrees Celsius), shape (years, 12, spatial_dim_1, spatial_dim_2) or (12, spatial_dim_1, spatial_dim_2)
+            P (numpy.ndarray): 3D array of monthly precipitation climatology (mm/month), shape (years, 12, spatial_dim_1, spatial_dim_2) or (12, spatial_dim_1, spatial_dim_2)
+
+        Returns:
+            dict: A dictionary containing:
+                - 'Class': 2D array of the final Köppen-Geiger subclass classification.
+                - 'Major': 2D array of the final Köppen-Geiger major class classification
+        """
+
+        # Check if T and P have a year dimension
+        if T.ndim == 4 and P.ndim == 4:
+            logging.info("Input data has a year dimension. Classifying each year separately and taking the mode across years for final classification.")
+
+            n_years = T.shape[0]
+            class_list = []
+            major_list = []
+            for i in range(n_years):
+                output = self.single_year_classification(T[i,:,:,:], P[i,:,:,:])
+                class_list.append(output['Class'])
+                major_list.append(output['Major'])
+            class_array = np.stack(class_list, axis=0)
+            major_array = np.stack(major_list, axis=0)
+
+            # Take the mode across years for final classification
+            final_class = stats.mode(class_array, axis=0, nan_policy='omit').mode
+            final_major = stats.mode(major_array, axis=0, nan_policy='omit').mode
+
+            # Calculate confidence as the proportion of years that agree with the mode classification
+            confidence_major = np.sum(major_array == final_major, axis=0) / n_years
+            confidence_class = np.sum(class_array == final_class, axis=0) / n_years
+            confidence = {'Class': confidence_class, 'Major': confidence_major}
+
+            return {'Class': final_class, 'Major': final_major, 'Confidence': confidence}
+        
+        else:
+            logging.info("Input data does not have a year dimension. Classifying using single year classification.")
+            return self.single_year_classification(T, P)
+
+    def single_year_classification(self, T, P):
+        """
+        Applies the Köppen-Geiger classification to the provided temperature and precipitation data for a single year of climatology
+
+
+        Args:
+            T (numpy.ndarray): 3D array of monthly temperature climatology (degrees Celsius), shape (12, spatial_dim_1, spatial_dim_2)
+            P (numpy.ndarray): 3D array of monthly precipitation climatology (mm/month), shape (12, spatial_dim_1, spatial_dim_2)
+
+        Returns:
+            dict: A dictionary containing:
+                - 'Class': 2D array of the final Köppen-Geiger subclass classification.
+                - 'Major': 2D array of the final Köppen-Geiger major class classification
+        """
+
+        # Check that T and P have the correct shape
+        if T.ndim != 3 or P.ndim != 3:
+            raise ValueError("T and P should be 3D arrays with shape (12, spatial_dim_1, spatial_dim_2)")
+        if T.shape[0] != 12 or P.shape[0] != 12:
+            raise ValueError("T and P should have shape (12, spatial_dim_1, spatial_dim_2)")
+        if T.shape[1:] != P.shape[1:]:
+            raise ValueError("T and P should have the same spatial dimensions")
+        
+
         return koppen_geiger(T, P, self.koppen_table)
 
 
