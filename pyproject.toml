@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aimip1-generalisability"
+version = "0.1.0"
+description = "Clustering surface fields into climate zones for tracking climate zone shifts caused by climate forcings."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=1.23",
+    "pandas>=1.5",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+]
+
+[tool.setuptools]
+packages = ["cluster", "cluster.cluster_utils"]
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
