@@ -7,27 +7,41 @@ References:
 [2] https://github.com/hylken/Koppen-Geiger_maps/blob/3cc46c78d68bc9071fe17a3b75ec195b5ce4bdc0/tools.py#L91
 
 Change log:
-- 10-02-26: Initial implementation by [BSC]
+- 10-02-26: Initial implementation by [BSC] 
     - Updated description to include arguments and return descriptions.
     - Changed np.NaN to np.nan to work with numpy > 2.0
+    Commit: (efced563f499f9d611376c6600cc420928a562c1)
+
+    - Corrected description regarding ordering of dimensions
 """
 
 import numpy as np
+import cluster
+import pandas as pd
+
+class KoppenGeiger():
+    def __init__(self, koppen_table_path: str=cluster.__path__[0] + '/cluster_assets/koppen_table.csv'):
+        self.koppen_table = pd.read_csv(koppen_table_path)
+
+    def classify(self, T, P):
+        return koppen_geiger(T, P, self.koppen_table)
+
+
 
 def koppen_geiger(T,P,koppen_table):
     """This function classifies monthly temperature and precipitation
     climatologies according to the Koppen-Geiger climate classification. The
     inputs 'T' and 'P' represent the temperature and precipitation
     climatologies respectively, and should be provided as three-dimensional
-    arrays with the third dimension representing time (12 months). The
+    arrays with the 1st dimension representing time (12 months). The
     temperature data should be in units of degrees Celsius and the
     precipitation data in units of mm/month. The 'koppen_table' input is a
     table used to classify the climate. The function returns the climate class
     and major type of the area. 
 
     Args:
-        T (numpy.ndarray): 3D array of monthly temperature climatology (degrees Celsius), shape (12, lat, lon).
-        P (numpy.ndarray): 3D array of monthly precipitation climatology (mm/month), shape (12, lat, lon).
+        T (numpy.ndarray): 3D array of monthly temperature climatology (degrees Celsius), shape (lat, lon, 12)
+        P (numpy.ndarray): 3D array of monthly precipitation climatology (mm/month), shape (lat, lon, 12)
         koppen_table (pandas.DataFrame): Table used for classifying the climate.
 
     Returns:

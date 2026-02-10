@@ -18,6 +18,11 @@ def test_koppen_geiger():
     P = np.random.rand(12, 5, 5) * 200  # Random precipitation between 0 and 200 mm/month
 
     # Call the koppen_geiger function
-    climate_class, major_type = cluster.cluster_utils.koppen_geiger(T, P, koppen_table)
+    output = cluster.cluster_utils.koppen_geiger(T, P, koppen_table)
 
-    
+    assert 'Class' in output, "Output should contain 'Class' key"
+    assert 'Major' in output, "Output should contain 'Major' key"
+    assert output['Class'].shape == (5, 5), "Class output should have shape (5, 5)"
+    assert output['Major'].shape == (5, 5), "Major output should have shape (5, 5)"
+    assert np.all(np.isfinite(output['Class'])), "Class output should not contain NaN values"
+    assert np.all(np.isfinite(output['Major'])), "Major output should not contain NaN values"
