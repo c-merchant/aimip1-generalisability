@@ -12,8 +12,8 @@ Version history:
 """
 
 import logging
-import cluster
 import numpy as np
+from .cluster_utils.koppen_geiger import KoppenGeiger
 
 class Cluster():
     def __init__(self, cluster_method: str):
@@ -48,6 +48,18 @@ class Cluster():
         return self.cluster_method.classify(T, P)
 
 
+    def classify_per_year(self, T: np.ndarray, P: np.ndarray):
+        """Per-year Major classification without collapsing to mode.
+
+        Args:
+            T (numpy.ndarray): 4D array of shape (years, 12, lat, lon) in °C.
+            P (numpy.ndarray): 4D array of shape (years, 12, lat, lon) in mm/month.
+
+        Returns:
+            numpy.ndarray: 3D int array of shape (years, lat, lon) with Major class IDs.
+        """
+        return self.cluster_method.classify_per_year(T, P)
+
     def _get_cluster_method(self, cluster_method_name: str):
         """
         Retrieves the clustering method based on the provided name. 
@@ -63,6 +75,6 @@ class Cluster():
         """
 
         if cluster_method_name == 'koppen_geiger':
-            return cluster.KoppenGeiger()
+            return KoppenGeiger()
         else:
             raise ValueError(f"Cluster method '{cluster_method_name}' not recognized. Please choose a valid cluster method.")

@@ -17,13 +17,15 @@ Change log:
 """
 
 import numpy as np
-import cluster
 import pandas as pd
 import logging
+from pathlib import Path
 from scipy import stats
 
+_ASSET_DIR = Path(__file__).resolve().parent.parent / 'cluster_assets'
+
 class KoppenGeiger():
-    def __init__(self, koppen_table_path: str=cluster.__path__[0] + '/cluster_assets/koppen_table.csv'):
+    def __init__(self, koppen_table_path: str=str(_ASSET_DIR / 'koppen_table.csv')):
         self.koppen_table = pd.read_csv(koppen_table_path)
 
 
@@ -75,6 +77,27 @@ class KoppenGeiger():
             logging.info("Input data does not have a year dimension. Classifying using single year classification.")
             return self.single_year_classification(T, P)
 
+    def classify_per_year(self, T, P):
+        """Per-year Major classification without collapsing to mode.
+
+        Args:
+            T (numpy.ndarray): 4D array of shape (years, 12, lat, lon) in °C.
+            P (numpy.ndarray): 4D array of shape (years, 12, lat, lon) in mm/month.
+
+        Returns:
+            numpy.ndarray: 3D int array of shape (years, lat, lon) with Major
+                class IDs (1–5, NaN for ocean).
+        """
+        if T.ndim != 4 or P.ndim != 4:
+            raise ValueError("T and P must be 4D arrays with shape (years, 12, lat, lon)")
+
+        n_years = T.shape[0]
+        major_list = []
+        for i in range(n_years):
+            output = self.single_year_classification(T[i, :, :, :], P[i, :, :, :])
+            major_list.append(output['Major'])
+        return np.stack(major_list, axis=0)
+
     def single_year_classification(self, T, P):
         """
         Applies the Köppen-Geiger classification to the provided temperature and precipitation data for a single year of climatology
@@ -115,8 +138,8 @@ def koppen_geiger(T,P,koppen_table):
     and major type of the area. 
 
     Args:
-        T (numpy.ndarray): 3D array of monthly temperature climatology (degrees Celsius), shape (lat, lon, 12)
-        P (numpy.ndarray): 3D array of monthly precipitation climatology (mm/month), shape (lat, lon, 12)
+        T (numpy.ndarray): 3D array of monthly temperature climatology (degrees Celsius), shape (12, lat, lon)
+        P (numpy.ndarray): 3D array of monthly precipitation climatology (mm/month), shape (12, lat, lon)
         koppen_table (pandas.DataFrame): Table used for classifying the climate.
 
     Returns:
@@ -153,7 +176,7 @@ def koppen_geiger(T,P,koppen_table):
     Pwdry = np.nanmin(P*tmp,axis=0)
     Pwwet = np.nanmax(P*tmp,axis=0)
 
-    # Mean annual temperature and preciptiation (MAT and MAP)
+    # Mean annual temperature and precipitation (MAT and MAP)
     # Number of months with temperature >10 degrees C
     # Temperature of hottest and coldest months
     MAT = np.mean(T,axis=0)

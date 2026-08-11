@@ -5,22 +5,37 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "aimip1-generalisability"
 version = "0.1.0"
-description = "Clustering surface fields into climate zones for tracking climate zone shifts caused by climate forcings."
+description = "Assessment of learnt generalisability in AIMIP (AI-driven) climate models vs AMIP models, using ERA5 as ground truth."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 dependencies = [
     "numpy>=1.23",
     "pandas>=1.5",
-    "scipy>=1.17"
+    "scipy>=1.17",
+    "xarray>=2022.3",
+    "netCDF4>=1.6",
+    "healpy>=1.16",
+    "matplotlib>=3.6",
+    "cartopy>=0.21"
 ]
 
 [project.optional-dependencies]
+healpix = [
+    "torch>=2.0",
+    "earth2grid",
+]
 test = [
     "pytest>=7.0",
 ]
 
+[tool.uv.sources]
+earth2grid = { git = "https://github.com/NVlabs/earth2grid" }
+
 [tool.setuptools]
-packages = ["cluster", "cluster.cluster_utils"]
+packages = ["code", "code.cluster", "code.cluster.cluster_assets", "code.cluster.cluster_utils", "code.data", "code.figures"]
+
+[tool.setuptools.package-data]
+"code.cluster.cluster_assets" = ["*.csv"]
 
 [tool.pytest.ini_options]
 testpaths = ["test"]

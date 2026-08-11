@@ -1,9 +1,3 @@
-
-
-
-
-
-
 #############################################################
 #### Standard Python .gitignore file for Python projects ####
 #############################################################
@@ -216,3 +210,17 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Project-specific
+tmp/
+nohup*.out
+data.tar.gz
+code/figures/pdfs/
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.fdb_latexmk
+paper/*.fls
+paper/*.out
+paper/*.synctex.gz
+paper/*.pdf
