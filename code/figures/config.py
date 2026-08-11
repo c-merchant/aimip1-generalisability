@@ -1,11 +1,12 @@
 """
 Paths, constants, and parameters for figure pipeline.
 """
-import logging
-import warnings
+import logging, warnings
 from pathlib import Path
 
 logging.getLogger('matplotlib.font_manager').setLevel(logging.ERROR)
+warnings.filterwarnings("ignore", category=xr.SerializationWarning)
+warnings.filterwarnings("ignore", category=SmallSampleWarning)
 warnings.filterwarnings('ignore', message='Mean of empty slice')
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
