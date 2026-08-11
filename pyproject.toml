@@ -7,7 +7,7 @@ name = "aimip1-generalisability"
 version = "0.1.0"
 description = "Assessment of learnt generalisability in AIMIP (AI-driven) climate models vs AMIP models, using ERA5 as ground truth."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.14"
 dependencies = [
     "numpy>=1.23",
     "pandas>=1.5",
@@ -20,16 +20,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-healpix = [
-    "torch>=2.0",
-    "earth2grid",
-]
 test = [
     "pytest>=7.0",
 ]
-
-[tool.uv.sources]
-earth2grid = { git = "https://github.com/NVlabs/earth2grid" }
 
 [tool.setuptools]
 packages = ["code", "code.cluster", "code.cluster.cluster_assets", "code.cluster.cluster_utils", "code.data", "code.figures"]
@@ -39,3 +32,4 @@ packages = ["code", "code.cluster", "code.cluster.cluster_assets", "code.cluster
 
 [tool.pytest.ini_options]
 testpaths = ["test"]
+filterwarnings = ["ignore:numpy.ndarray size changed"]

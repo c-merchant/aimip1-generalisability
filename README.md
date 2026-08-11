@@ -16,7 +16,7 @@ source $HOME/.local/bin/env
 ```bash
 cd path/to/aimip1-generalisability
 uv sync
-uv sync --extra test --extra heal pix 
+uv sync --extra test
 ```
 
 ### Plotting figures
@@ -32,7 +32,6 @@ code/
 ├── data/                   Loader functions for AIMIP, ERA5, and AMIP
 ├── cluster/                Koppen-Geiger climate classification
 └── figures/                Figure pipeline
-
 test/                       Pytests
 paper/                      Manuscript
 era5_classification.npz     Cached ERA5 baseline classification

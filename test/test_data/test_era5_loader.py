@@ -8,7 +8,7 @@ import xarray as xr
 import pandas as pd
 import pytest
 from code.data.era5_loader import _to_arrays
-import earth2grid
+import healpy as hp
 
 def test_era5_loader_invalid_path():
     with pytest.raises(FileNotFoundError, match="Path not found"):
@@ -122,9 +122,8 @@ def test_to_arrays_healpix_grid():
     n_pixels = 12 * nside * nside  # 48
     times = pd.date_range('2000-01-01', periods=n_months, freq='MS')
 
-    # Get pixel centre coordinates from earth2grid in RING order
-    hpx = earth2grid.healpix.Grid(level=1, pixel_order=earth2grid.healpix.PixelOrder.RING)
-    pix_lat, pix_lon = hpx.lat, hpx.lon  # degrees, shape (48,)
+    # Pixel centre coordinates in RING order (healpy default)
+    pix_lon, pix_lat = hp.pix2ang(nside, np.arange(n_pixels), lonlat=True)  # degrees, shape (48,)
 
     # Uniform temperature field (300 K everywhere)
     tas_vals = np.full((n_months, n_pixels), 300.0)
@@ -158,8 +157,7 @@ def test_to_arrays_healpix_nonuniform():
     n_pixels = 12 * nside * nside
     times = pd.date_range('2000-01-01', periods=n_months, freq='MS')
 
-    hpx = earth2grid.healpix.Grid(level=4, pixel_order=earth2grid.healpix.PixelOrder.RING)
-    pix_lat, pix_lon = hpx.lat, hpx.lon
+    pix_lon, pix_lat = hp.pix2ang(nside, np.arange(n_pixels), lonlat=True)
 
     # Temperature increases linearly with latitude: -30 C at south pole, +30 C at north pole.
     lat_field_C = 30.0 * pix_lat / 90.0
