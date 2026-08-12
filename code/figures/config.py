@@ -2,12 +2,15 @@
 Paths, constants, and parameters for figure pipeline.
 """
 import logging, warnings
+import xarray as xr
 from pathlib import Path
+from scipy.stats._axis_nan_policy import SmallSampleWarning
 
 logging.getLogger('matplotlib.font_manager').setLevel(logging.ERROR)
 warnings.filterwarnings("ignore", category=xr.SerializationWarning)
 warnings.filterwarnings("ignore", category=SmallSampleWarning)
 warnings.filterwarnings('ignore', message='Mean of empty slice')
+warnings.filterwarnings('ignore', message='All-NaN slice encountered')
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 

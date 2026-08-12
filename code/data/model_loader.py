@@ -70,7 +70,7 @@ def load_model_tree(path, scenario_map, skip_models=frozenset(), label='model',
             if len(grids) > 1:
                 keep = next((g for g in sorted(grids) if g.startswith('gr')), 'gn' if 'gn' in grids else sorted(grids)[0])
                 file_lists[var] = [f for f in files if _grid_of(f) == keep]
-                logging.warning("Multiple grids %s for %s/%s; keeping %s", sorted(grids), key, var, keep)
+                logging.debug("Multiple grids %s for %s/%s; keeping %s", sorted(grids), key, var, keep)
 
     tasks = [(key, dict(file_lists)) for key, file_lists in catalog.items() if 'tas' in file_lists and 'pr' in file_lists]
     args = (start_year, end_year, land_mask, target_lat, target_lon)
