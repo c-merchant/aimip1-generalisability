@@ -79,7 +79,7 @@ uv run python -m code.figures.fig_baseline_differences
 Run the full pipeline detached, and log progress to `run_figs.log`:
 
 ```bash
-uv run python bash run_figs.sh > /dev/null 2>&1 &
+uv run python bash run_figs.sh > run_figs.log 2>&1 &
 ```
 
 Scripts run sequentially.
