@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper below."
+title: "How Do AI Climate Models Respond to Warming Across Climate Zones?"
+authors:
+  - family-names: Merchant
+    given-names: Charlotte C.
+  - family-names: Klöwer
+    given-names: Milan
+  - family-names: Stanley-Clamp
+    given-names: Bradley
+  - family-names: Höver
+    given-names: Maren
+  - family-names: Michel
+    given-names: Simon L. L.
+  - family-names: Groot
+    given-names: Edward
+  - family-names: Christensen
+    given-names: Hannah M.
+preferred-citation:
+  type: article
+  title: "How Do AI Climate Models Respond to Warming Across Climate Zones?"
+  authors:
+    - family-names: Merchant
+      given-names: Charlotte C.
+    - family-names: Klöwer
+      given-names: Milan
+    - family-names: Stanley-Clamp
+      given-names: Bradley
+    - family-names: Höver
+      given-names: Maren
+    - family-names: Michel
+      given-names: Simon L. L.
+    - family-names: Groot
+      given-names: Edward
+    - family-names: Christensen
+      given-names: Hannah M.
+  url: "https://arxiv.org/abs/2608.17986"
+identifiers:
+  - type: url
+    value: "https://arxiv.org/abs/2608.17986"
+    description: arXiv preprint

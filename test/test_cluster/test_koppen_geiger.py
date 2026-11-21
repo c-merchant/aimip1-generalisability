@@ -2,7 +2,7 @@
 Unit testing for the koppen_geiger functionality
 """
 
-import cluster
+from code import cluster
 import pandas as pd
 import numpy as np
 
@@ -57,6 +57,47 @@ def test_koppen_geiger_invalid_input():
         assert False, "Expected ValueError for invalid input shapes"
     except ValueError as e:
         assert str(e) == "T and P should be 3D arrays with shape (12, spatial_dim_1, spatial_dim_2)", f"Unexpected error message: {str(e)}"
+
+
+def test_koppen_geiger_known_profiles():
+    """Pin the classification arithmetic: known T/P profiles must map to their known major class.
+
+    Major ids: 1=A tropical, 2=B arid, 3=C temperate, 4=D cold, 5=E polar.
+    """
+    koppen_table_path = cluster.__path__[0] + '/cluster_assets/koppen_table.csv'
+    gk = cluster.KoppenGeiger(koppen_table_path)
+
+    def major(t_months, p_months):
+        T = np.array(t_months, dtype=float).reshape(12, 1, 1)
+        P = np.array(p_months, dtype=float).reshape(12, 1, 1)
+        return gk.classify(T, P)['Major'][0, 0]
+
+    # A (tropical): every month warm (Tmin >= 18) and wet enough to escape arid.
+    assert major([26] * 12, [200] * 12) == 1, "Warm wet all year should be Tropical (A)"
+
+    # B (arid): warm but very dry (MAP well below the aridity threshold).
+    assert major([25] * 12, [5] * 12) == 2, "Hot and very dry should be Arid (B)"
+
+    # C (temperate): hottest month > 10, coldest month between 0 and 18, not arid.
+    temperate_T = [4, 5, 8, 12, 16, 20, 22, 21, 18, 13, 8, 5]
+    assert major(temperate_T, [80] * 12) == 3, "Mild winter, warm summer, wet should be Temperate (C)"
+
+    # D (cold): hottest month > 10, coldest month <= 0, not arid.
+    cold_T = [-10, -8, -2, 5, 12, 18, 20, 18, 12, 4, -3, -8]
+    assert major(cold_T, [80] * 12) == 4, "Freezing winter, warm summer, wet should be Cold (D)"
+
+    # E (polar): hottest month <= 10.
+    assert major([-20, -18, -15, -8, -2, 3, 6, 5, 0, -8, -14, -18], [30] * 12) == 5, "No warm month should be Polar (E)"
+
+
+def test_koppen_geiger_arid_precedence():
+    """B (arid) must override C/D/E: a cold-winter dry profile that looks temperate/cold by temperature is still Arid."""
+    koppen_table_path = cluster.__path__[0] + '/cluster_assets/koppen_table.csv'
+    gk = cluster.KoppenGeiger(koppen_table_path)
+    # Temperate-looking temperatures but almost no precipitation -> must be B, not C.
+    T = np.array([4, 5, 8, 12, 16, 20, 22, 21, 18, 13, 8, 5], dtype=float).reshape(12, 1, 1)
+    P = np.array([2] * 12, dtype=float).reshape(12, 1, 1)
+    assert gk.classify(T, P)['Major'][0, 0] == 2, "Arid must take precedence over Temperate"
 
 
 def test_koppen_geiger_multiyear():

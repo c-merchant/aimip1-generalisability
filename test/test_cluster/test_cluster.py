@@ -2,7 +2,7 @@
 Unit testing clustering class
 """
 
-import cluster
+from code import cluster
 import numpy as np
 
 
