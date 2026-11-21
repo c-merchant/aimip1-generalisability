@@ -1,5 +1,6 @@
 # How Do AI Climate Models Respond to Warming Across Climate Zones?
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24422410.svg)](https://doi.org/10.5281/zenodo.24422410)
+
 **Paper:** Charlotte C. Merchant, Milan Klöwer, Bradley Stanley-Clamp, Maren Höver, Simon L. L. Michel, Edward Groot, and Hannah M. Christensen (2026). [arXiv:2608.17986](https://arxiv.org/abs/2608.17986)
 
 Code for evaluating AI climate models under prescribed sea-surface temperature (SST) warming. We use Köppen–Geiger climate zones to compare five AIMIP Phase 1 models with ERA5 (1979–2014) and physics-based AMIP models.
